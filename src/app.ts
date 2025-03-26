@@ -1,30 +1,26 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import 'dotenv/config';
+// libraries
+import "reflect-metadata";
+import dotenv from "dotenv";
+dotenv.config();
+import fastify from "fastify";
+import fastifySwagger from "@fastify/swagger";
+import { randomBytes } from "crypto";
+// import { PREFIX } from '@util';
+// import { middlewares, errorHandler } from '@infrastructure/api/middlewares';
+import { initRoutes } from "./api/routers";
+import { swagger_config } from "./plugin/swagger";
+import { PREFIX } from "./util/Envs";
+import { middlewares } from './api/middlewares/CommonMiddleware';
+export const application = fastify({
+  genReqId: (_) => randomBytes(20).toString("hex"),
+});
 
-class App {
-  public express: express.Application;
+// middlewares
+middlewares(application);
+// errorHandler(application);
 
-  constructor() {
-    this.express = express();
-    this.middlewares();
-    this.database();
-    this.routes();
-  }
+//fastify swagger
+application.register(fastifySwagger, swagger_config);
 
-  private middlewares(): void {
-    this.express.use(bodyParser.json());
-    this.express.use(cors());
-  }
-
-  private database(): void {
-    // Configuración inicial de BD (se implementará luego)
-  }
-
-  private routes(): void {
-    // Rutas principales (se implementarán luego)
-  }
-}
-
-export default new App().express;
+// routes
+application.register(initRoutes, { prefix: PREFIX });

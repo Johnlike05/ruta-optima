@@ -1,8 +1,19 @@
-import app from './app';
-import { config } from './config';
+import dotenv from 'dotenv';
+import 'module-alias/register';
+dotenv.config();
+import { application } from './app';
+import { createDependencyContainer } from './configuration/DependecyContainer';
 
-const PORT = config.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const start = async () => {
+    const port: number = parseInt(process.env.PORT ?? "8080") || 8080;
+    try {
+        const server = await application.listen({port: port, host: '0.0.0.0'});
+        application.swagger();
+        createDependencyContainer();
+        console.log(`Application running on ${server}`);
+    } catch (error) {
+        console.error(error);
+        await application.close();
+    }
+};
+start();
