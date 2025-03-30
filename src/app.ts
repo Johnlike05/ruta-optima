@@ -5,6 +5,7 @@ dotenv.config();
 import fastify from "fastify";
 import fastifySwagger from "@fastify/swagger";
 import { randomBytes } from "crypto";
+require('module-alias/register');
 // import { PREFIX } from '@util';
 // import { middlewares, errorHandler } from '@infrastructure/api/middlewares';
 import { initRoutes } from "./api/routers";

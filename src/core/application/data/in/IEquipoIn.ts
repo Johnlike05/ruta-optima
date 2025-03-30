@@ -1,3 +1,3 @@
 export interface IEquipoIn {
-    codigo_equipo: string;
+    id_repartidor: number;
 }

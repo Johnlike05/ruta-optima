@@ -9,5 +9,8 @@ export const calcularRutaOptima = async (req: FastifyRequest, reply: FastifyRepl
     const entregarMasiva = DEPENDENCY_CONTAINER.get(CalcularRutasAppService);
     const data = validateData<IEquipoIn>(IEquipoInSchema, req.body);
     const response = await entregarMasiva.rutaOptima(data);
-    return reply.send({ ...response, id: req.id });
+    if (response) {
+        return reply.send({ ...response, id: req.id });
+    }
+    return reply.send({ respuesta: 'No se pudo generar guias por que el repartidor no tiene envios asignados hoy', id: req.id });
 };
