@@ -5,7 +5,6 @@ type Schema = Joi.ObjectSchema | Joi.ArraySchema;
 type Body = Record<string, unknown> | undefined | unknown;
 
 export const validateData = <T>(schema: Schema, dataToValidate: Body): T => {
-    console.log('HOLASA'); 
     
     if (dataToValidate) {
         const { error, value } = schema.validate(dataToValidate, { convert: true });

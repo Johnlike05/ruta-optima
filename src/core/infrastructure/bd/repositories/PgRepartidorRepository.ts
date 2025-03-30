@@ -2,7 +2,6 @@ import { PgEnvioRepository } from "./PgEnvioRepository";
 import { DEPENDENCY_CONTAINER } from "@/configuration/DependecyContainer";
 import { IDatabase, IMain } from "pg-promise";
 import { TYPESDEPENDENCIES } from "@/configuration/TypesDependencies";
-import { Envio } from "@/core/domain/entities/Envio";
 import { IRepartidorRepository } from "@/core/domain/repositories/IRepartidorRepository";
 import { Repartidor, Ubicacion } from "@/core/domain/entities/Repartidor";
 
@@ -10,8 +9,6 @@ export class PgRepartidorRepository implements IRepartidorRepository {
     private dbRutas = DEPENDENCY_CONTAINER.get<IDatabase<IMain>>(
         TYPESDEPENDENCIES.bdRutas,
     );
-
-
     async buscarPorId(id: number): Promise<Repartidor | null> {
         const query = `
             SELECT * FROM john_schema.repartidor
@@ -21,7 +18,6 @@ export class PgRepartidorRepository implements IRepartidorRepository {
         const result = await this.dbRutas.oneOrNone(query, [id]);
         return result
     }
-
     async consultarRutaDiaria(id_repartidor: number): Promise<number | null> {
 
         try {

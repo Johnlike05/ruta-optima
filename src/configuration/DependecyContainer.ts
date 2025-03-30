@@ -11,10 +11,13 @@ import { GeolocalizarService } from '@/core/application/services/GeolocalizarSer
 import { adapter } from '@/core/infrastructure/bd/adapter/RedisConfig';
 import { CacheGenericDao } from '@/core/infrastructure/bd/repositories/CacheGenericDao';
 import { CacheRepository } from '@/core/domain/repositories/CacheRepository';
+import { EventoAppService } from '@/core/application/services/EventoAppService';
+import { PgEventoRepository } from '@/core/infrastructure/bd/repositories/PgEventoRepository';
 export const DEPENDENCY_CONTAINER = new Container();
 
 export const createDependencyContainer = (): void => {
     DEPENDENCY_CONTAINER.bind(CalcularRutasAppService).toSelf().inSingletonScope();
+    DEPENDENCY_CONTAINER.bind(EventoAppService).toSelf().inSingletonScope();
     DEPENDENCY_CONTAINER.bind(GeolocalizarService).toSelf().inSingletonScope();
     DEPENDENCY_CONTAINER.bind<IDatabase<IMain>>(TYPESDEPENDENCIES.bdRutas).toConstantValue(bdRutas);
     DEPENDENCY_CONTAINER.bind(TYPESDEPENDENCIES.CacheAdapter).toConstantValue(adapter);
@@ -26,6 +29,9 @@ export const createDependencyContainer = (): void => {
     .inSingletonScope();
     DEPENDENCY_CONTAINER.bind<PgRutaRepository>(TYPESDEPENDENCIES.IRutaRepository)
     .to(PgRutaRepository)
+    .inSingletonScope();
+    DEPENDENCY_CONTAINER.bind<PgEventoRepository>(TYPESDEPENDENCIES.IEventoRepository)
+    .to(PgEventoRepository)
     .inSingletonScope();
     DEPENDENCY_CONTAINER.bind<PgGeolocalizarRepository>(TYPESDEPENDENCIES.IGeolocalizarRepository)
     .to(PgGeolocalizarRepository)

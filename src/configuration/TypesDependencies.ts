@@ -6,4 +6,5 @@ export const TYPESDEPENDENCIES = {
   IGeolocalizarRepository: Symbol.for("IGeolocalizarRepository"),
   CacheAdapter: Symbol.for("CacheAdapter"),
   CacheGenericDao: Symbol.for("CacheGenericDao"),
+  IEventoRepository: Symbol.for("IEventoRepository")
 };

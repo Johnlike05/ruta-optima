@@ -52,7 +52,7 @@ export class CalcularRutasAppService {
         const ordenPuntos = await this.calcularRutaOptimizada(puntos);
         const arrayOrdenado = this.reorderPoints(puntosRuta, ordenPuntos.optimized_route);
         //se puede consultar mas a detalle el tiempo y los km pero consume mucho tiempo
-        return await this.rutaRepository.crearRuta(data.id_repartidor, arrayOrdenado);
+        return await this.rutaRepository.crearRuta(data.id_repartidor, arrayOrdenado, ordenPuntos.total_distance_meters, ordenPuntos.estimated_time_minutes);
     } catch (error) {
         console.error("Error No se pudo consultar la ruta", error);
         return null;

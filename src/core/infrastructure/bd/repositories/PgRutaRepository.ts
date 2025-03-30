@@ -9,7 +9,7 @@ export class PgRutaRepository implements IRutaRepository {
     private dbRutas = DEPENDENCY_CONTAINER.get<IDatabase<IMain>>(
         TYPESDEPENDENCIES.bdRutas,
     );
-    async crearRuta(repartidorId: number, puntos: PuntoRuta[]): Promise<Ruta> {
+    async crearRuta(repartidorId: number, puntos: PuntoRuta[], distancia_total: number, tiempo_estimado: number): Promise<Ruta> {
         try {
             await this.dbRutas.query('BEGIN');
 
@@ -26,8 +26,8 @@ export class PgRutaRepository implements IRutaRepository {
             
             const rutaResult = await this.dbRutas.oneOrNone(rutaQuery, [
                 repartidorId,
-                0,
-                0
+                distancia_total,
+                tiempo_estimado
             ]);
             
             const rutaId = rutaResult.id_ruta;  
