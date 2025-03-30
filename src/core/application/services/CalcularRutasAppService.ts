@@ -9,6 +9,7 @@ import { PuntoRuta, RespuestaPythonOrden, Ruta } from "@/core/domain/entities/Ru
 import { PgRepartidorRepository } from "@/core/infrastructure/bd/repositories/PgRepartidorRepository";
 import { exec } from "child_process";
 import { OSRMAdapter } from "@/core/infrastructure/externalServices/OSRMAdapter";
+import { PgEventoRepository } from "@/core/infrastructure/bd/repositories/PgEventoRepository";
 @injectable()
 export class CalcularRutasAppService {
   private rutaRepository = DEPENDENCY_CONTAINER.get<PgRutaRepository>(
@@ -22,9 +23,12 @@ export class CalcularRutasAppService {
   );
   private entregarMasiva = DEPENDENCY_CONTAINER.get(GeolocalizarService);
 
+  private eventoRepository = DEPENDENCY_CONTAINER.get<PgEventoRepository>(
+    TYPESDEPENDENCIES.IEventoRepository
+  );
   async rutaOptima(data: IEquipoIn): Promise<Ruta | null> {
     try {
-        const repartidorRuta = await this.repartidorRepository.consultarRutaDiaria(data.id_repartidor);
+        const repartidorRuta = await this.rutaRepository.consultarRutaDiaria(data.id_repartidor);
         if (repartidorRuta) {
             return await this.rutaRepository.obtenerRutaPorId(repartidorRuta);
         }
@@ -108,9 +112,31 @@ export class CalcularRutasAppService {
         estimated_time_minutes: (route.duration / 60).toFixed(2),
     };
 }
-
- reorderPoints(puntos: PuntoRuta[], optimizedRoute: number[]) {
+reorderPoints(puntos: PuntoRuta[], optimizedRoute: number[]) {
     return optimizedRoute.map(index => puntos[index]);
   }
+
+async recalcularRuta(data: IEquipoIn): Promise<string | null> {
+    try {
+        const repartidorRuta = await this.rutaRepository.consultarRutaDiaria(data.id_repartidor);
+        if (repartidorRuta) {
+            const eventos = await this.eventoRepository.consultarEventoByRuta(repartidorRuta)
+            if (eventos.length>0) {
+                const tiempoTotal = eventos.reduce((total, evento) => total + evento.tiempo_estimado, 0);
+                const idsEventos = eventos.map(evento => evento.id_evento);
+                await this.rutaRepository.agregarTiempoRuta(tiempoTotal, repartidorRuta)
+                await this.eventoRepository.marcarEventosCompletados(idsEventos)
+                return 'Eventos agregados a la ruta'
+            }
+            return 'No hay eventos pendientes por recalcular'
+        }else {
+            return 'No se encontro ruta actual para el repartidor enviado'
+        }
+    } catch (error) {
+        console.error("Error No se pudo consultar la ruta", error);
+        return null;
+    }
+}
+
   
 }

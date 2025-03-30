@@ -17,5 +17,4 @@ export interface IRepartidorRepository {
     // // Métodos base (pueden estar ocultos)
     // guardar(repartidor: Repartidor): Promise<void>;
     buscarPorId(id: number): Promise<Repartidor | null>;
-    consultarRutaDiaria(id_repartidor: number): Promise<number | null>
 }

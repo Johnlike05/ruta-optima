@@ -18,27 +18,6 @@ export class PgRepartidorRepository implements IRepartidorRepository {
         const result = await this.dbRutas.oneOrNone(query, [id]);
         return result
     }
-    async consultarRutaDiaria(id_repartidor: number): Promise<number | null> {
-
-        try {
-            const query = `
-            SELECT id_ruta
-             FROM john_schema.ruta
-             WHERE id_repartidor = $/id_repartidor/
-             AND fecha_creacion >= NOW() - INTERVAL '24 HOURS';
-         `;
-         
-         const result = await this.dbRutas.oneOrNone(query, {id_repartidor: id_repartidor});
-         if (result) {
-             return result.id_ruta;
-         }
-         return null;
-
-        } catch (error) {
-            console.log('Error en consultarRutaDiaria', error);
-            return null;
-        }
-    }
     // Métodos de dominio
     // async asignarEnvioOptimo(envio: Envio): Promise<Repartidor | null> {
     //     try {
