@@ -8,7 +8,7 @@ on:
 env:
   SERVICE_NAME: ruta-optima
   REGION: us-central1
-
+  PROJECT_ID: pruebadesarrollosenior
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
