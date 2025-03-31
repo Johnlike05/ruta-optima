@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import Redis from "ioredis";
 
-const url = `redis://default:ispjLYdfRvdXIxbfN00IY9jhe051W4TL@redis-15763.c1.us-central1-2.gce.redns.redis-cloud.com:15763`;
+const url = `redis://default:ispjLYdfRvdXIxbfN00IY9jhe051W4TL@redis-15763.c1.us-central1-2.gce.redns.redis-cloud.com:15763`
 export const adapter = new Redis(url, {
   connectTimeout: parseInt("4000"),
 });
