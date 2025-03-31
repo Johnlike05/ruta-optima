@@ -1,4 +1,4 @@
-	check-group:
+check-group:
 ifndef ENV
 	$(error Please set ENV=[dev|test|prod])
 endif
