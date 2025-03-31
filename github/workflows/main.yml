@@ -1,9 +1,9 @@
-name: Main Flow
+name: Master Flow
 
 on:
   push:
     branches:
-      - main
+      - master
 
 env:
   SERVICE_NAME: ruta-optima-service
