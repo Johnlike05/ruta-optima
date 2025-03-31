@@ -8,7 +8,7 @@ on:
 env:
   SERVICE_NAME: ruta-optima
   REGION: us-central1
-  GCP_PROJECT: ${{ secrets.PROJECT_ID_PROD }}
+  GCP_PROJECT: pruebadesarrollosenior
 
 jobs:
   build_and_deploy:
