@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  SERVICE_NAME: ruta-optima
+  SERVICE_NAME: ruta-optima-service
   REGION: us-central1
   GCP_PROJECT: ${{ secrets.PROJECT_ID_PROD }}
 
