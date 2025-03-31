@@ -8,8 +8,9 @@ import { GeolocalizarService } from "./GeolocalizarService";
 import { PuntoRuta, RespuestaPythonOrden, Ruta } from "@/core/domain/entities/Ruta";
 import { PgRepartidorRepository } from "@/core/infrastructure/bd/repositories/PgRepartidorRepository";
 import { exec } from "child_process";
-import { OSRMAdapter } from "@/core/infrastructure/externalServices/OSRMAdapter";
+// import { OSRMAdapter } from "@/core/infrastructure/externalServices/OSRMAdapter";
 import { PgEventoRepository } from "@/core/infrastructure/bd/repositories/PgEventoRepository";
+import { BadMessageException } from "@/shared/exceptions/Exceptions";
 @injectable()
 export class CalcularRutasAppService {
   private rutaRepository = DEPENDENCY_CONTAINER.get<PgRutaRepository>(
@@ -33,7 +34,6 @@ export class CalcularRutasAppService {
             return await this.rutaRepository.obtenerRutaPorId(repartidorRuta);
         }
         const infoRepartidor = await this.repartidorRepository.buscarPorId(data.id_repartidor)
-
         const envios = await this.envioRepository.listarPorRepartidor(data.id_repartidor);
         if (envios.length === 0 || infoRepartidor ===null) return null;
         const puntoInicial:PuntoRuta = {    
@@ -44,6 +44,7 @@ export class CalcularRutasAppService {
         }
         const direcciones = envios.map(envio => `${envio.direccion_destino} ${envio.ciudad_destino}`);
         const coordenadasArray = await this.entregarMasiva.getCoordinatesArray(direcciones)
+
         const puntosRuta: PuntoRuta[] = coordenadasArray.map((coordenadas, i) => coordenadas && coordenadas.latitud !== 0
                 ? { latitud: coordenadas.latitud, longitud: coordenadas.longitud, tiempoEstimado: 1, direccion: direcciones[i] }
                 : null
@@ -53,13 +54,13 @@ export class CalcularRutasAppService {
         if (puntosRuta.length === 0) return null;
         puntosRuta.unshift(puntoInicial)
         const puntos = puntosRuta.map(p => ({ latitud: p.latitud, longitud: p.longitud }));
+
         const ordenPuntos = await this.calcularRutaOptimizada(puntos);
         const arrayOrdenado = this.reorderPoints(puntosRuta, ordenPuntos.optimized_route);
-        //se puede consultar mas a detalle el tiempo y los km pero consume mucho tiempo
         return await this.rutaRepository.crearRuta(data.id_repartidor, arrayOrdenado, ordenPuntos.total_distance_meters, ordenPuntos.estimated_time_minutes);
     } catch (error) {
-        console.error("Error No se pudo consultar la ruta", error);
-        return null;
+        console.log("Error No se pudo consultar la ruta", error);
+        throw error;
     }
 }
 
@@ -102,16 +103,16 @@ export class CalcularRutasAppService {
         });
     });
 }
- async detalleRuta(coordenadas: { latitud: number; longitud: number }[]) {
-    const routeData = await OSRMAdapter.getRutaOSRM(coordenadas);
-    if (!routeData || !routeData.routes || routeData.routes.length === 0) return null;
+//  async detalleRuta(coordenadas: { latitud: number; longitud: number }[]) {
+//     const routeData = await OSRMAdapter.getRutaOSRM(coordenadas);
+//     if (!routeData || !routeData.routes || routeData.routes.length === 0) return null;
 
-    const route = routeData.routes[0];
-    return {
-        total_distance_km: (route.distance / 1000).toFixed(2),
-        estimated_time_minutes: (route.duration / 60).toFixed(2),
-    };
-}
+//     const route = routeData.routes[0];
+//     return {
+//         total_distance_km: (route.distance / 1000).toFixed(2),
+//         estimated_time_minutes: (route.duration / 60).toFixed(2),
+//     };
+// }
 reorderPoints(puntos: PuntoRuta[], optimizedRoute: number[]) {
     return optimizedRoute.map(index => puntos[index]);
   }
@@ -134,7 +135,7 @@ async recalcularRuta(data: IEquipoIn): Promise<string | null> {
         }
     } catch (error) {
         console.error("Error No se pudo consultar la ruta", error);
-        return null;
+        throw new BadMessageException('Error No se pudo consultar la ruta', JSON.stringify(error));
     }
 }
 

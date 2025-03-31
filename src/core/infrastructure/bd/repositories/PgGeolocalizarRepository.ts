@@ -10,22 +10,10 @@ export class PgGeolocalizarRepository implements IGeolocalizarRepository {
   private redis = DEPENDENCY_CONTAINER.get<CacheRepository>(
     TYPESDEPENDENCIES.CacheGenericDao
   );
-  async getCoordinates(address: string): Promise<Coordenadas | null> {
-    const keyRedis = "geo" + address;
-    const responseRedis = await this.redis.get<string>(keyRedis);
-    if (responseRedis) {
-      return JSON.parse(responseRedis);
-    }
-    const coordenadasGoogle = await googleMapsClient(address);
-    if (coordenadasGoogle) {
-      this.redis.set(keyRedis, JSON.stringify(coordenadasGoogle));
-      return coordenadasGoogle;
-    }
-    return null
-  }
   async batchGeocode(addresses: string[]): Promise<Coordenadas[]> {
     const keys = addresses.map(addr => "geo:" + addr);
     const cachedResults = await Promise.all(keys.map(key => this.redis.get<string>(key)));
+
     const missingIndexes: number[] = [];
     const missingAddresses: string[] = [];
     const coordenadasCacheadas: (Coordenadas | null)[] = cachedResults.map((result, index) => {

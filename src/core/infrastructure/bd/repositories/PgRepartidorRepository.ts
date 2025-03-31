@@ -1,4 +1,3 @@
-import { PgEnvioRepository } from "./PgEnvioRepository";
 import { DEPENDENCY_CONTAINER } from "@/configuration/DependecyContainer";
 import { IDatabase, IMain } from "pg-promise";
 import { TYPESDEPENDENCIES } from "@/configuration/TypesDependencies";

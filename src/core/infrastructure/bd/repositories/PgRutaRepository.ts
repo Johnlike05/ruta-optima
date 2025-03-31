@@ -69,38 +69,66 @@ export class PgRutaRepository implements IRutaRepository {
       throw error;
     }
   }
-
   async obtenerRutaPorId(ruta_id: number): Promise<Ruta> {
-    const query = `
-            SELECT r.*,
-                   json_agg(
-                       json_build_object(
-                           'orden', pr.orden,
-                           'latitud', pr.latitud,
-                           'longitud', pr.longitud,
-                           'tiempoEstimado', pr.tiempo_estimado
-                       ) ORDER BY pr.orden
-                   ) as puntos
-            FROM john_schema.ruta r
-            JOIN john_schema.punto_ruta pr ON r.id_ruta = pr.id_ruta
-            WHERE r.id_ruta = $/ruta_id/
-            GROUP BY r.id_ruta
-        `;
+    const queryRuta = `
+      SELECT 
+        r.id_ruta, 
+        r.id_repartidor, 
+        r.fecha_creacion, 
+        r.distancia_total, 
+        r.tiempo_estimado, 
+        r.estado, 
+        r.optimizada
+      FROM john_schema.ruta r
+      WHERE r.id_ruta = $1;
+    `;
+  
+    const ruta = await this.dbRutas.oneOrNone(queryRuta, [ruta_id]);
+  
+    if (!ruta) {
+      throw new Error('Ruta no encontrada');
+    }
+    const queryPuntos = `
+      SELECT 
+        pr.orden, 
+        pr.latitud, 
+        pr.longitud, 
+        pr.tiempo_estimado
+      FROM john_schema.punto_ruta pr
+      WHERE pr.id_ruta = $1
+      ORDER BY pr.orden;
+    `;
+  
+    const puntos = await this.dbRutas.any(queryPuntos, [ruta_id]);
 
-    const result = await this.dbRutas.oneOrNone(query, { ruta_id: ruta_id });
-    return result;
+    const puntosFormateados = puntos.map(punto => ({
+      orden: punto.orden,
+      latitud: punto.latitud,
+      longitud: punto.longitud,
+      tiempoEstimado: punto.tiempo_estimado,
+    }));
+  
+    // Devolvemos la ruta junto con los puntos agrupados
+    return {
+      ...ruta,
+      puntos: puntosFormateados,
+    };
   }
+  
   async consultarRutaDiaria(id_repartidor: number): Promise<number | null> {
+    
     try {
+      
+        const ahora = new Date().toISOString().slice(0, 19).replace("T", " ");
       const query = `
         SELECT id_ruta
          FROM john_schema.ruta
          WHERE id_repartidor = $/id_repartidor/
-         AND fecha_creacion >= NOW() - INTERVAL '24 HOURS';
+         AND fecha_creacion >= (CAST($/ahora/ AS TIMESTAMP) - INTERVAL '24 HOURS');
      `;
-
       const result = await this.dbRutas.oneOrNone(query, {
         id_repartidor: id_repartidor,
+        ahora: ahora,
       });
       if (result) {
         return result.id_ruta;
@@ -126,7 +154,7 @@ export class PgRutaRepository implements IRutaRepository {
         return result.id_ruta;
       }
     } catch (error) {
-      console.log("Error en consultarRutaDiaria", error);
+      console.log("Error en agregarTiempoRuta", error);
     }
   }
 }

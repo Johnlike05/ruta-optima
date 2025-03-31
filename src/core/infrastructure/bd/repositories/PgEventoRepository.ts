@@ -12,8 +12,8 @@ export class PgEventoRepository implements IEventoRepository {
         async agregarEvento(data: IEventoIn, id_ruta: number): Promise<void> {
             try {
             const query = `
-                    INSERT INTO john_schema.evento (tipo, descripcion, latitud, longitud, tiempo_estimado, id_ruta, id_repartidor, agregado ) 
-                        VALUES ($/tipo/, $/descripcion/, $/latitud/, $/longitud/, $/tiempo_estimado/, $/id_ruta/, $/id_repartidor/, false);
+                    INSERT INTO john_schema.evento (tipo, descripcion, latitud, longitud, tiempo_estimado, id_ruta, id_repartidor, pendiente ) 
+                        VALUES ($/tipo/, $/descripcion/, $/latitud/, $/longitud/, $/tiempo_estimado/, $/id_ruta/, $/id_repartidor/, true);
                     `;
             await this.dbRutas.oneOrNone(query, {
                 tipo: data.tipo,

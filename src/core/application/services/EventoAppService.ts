@@ -14,7 +14,7 @@ export class EventoAppService {
     TYPESDEPENDENCIES.IRepartidorRepository
   );
   private rutaRepository = DEPENDENCY_CONTAINER.get<PgRutaRepository>(
-    TYPESDEPENDENCIES.IRepartidorRepository
+    TYPESDEPENDENCIES.IRutaRepository
   );
   async agregarEvento(data: IEventoIn): Promise<string | null> {
     

@@ -12,5 +12,5 @@ export const agregarEventoRouter = async (req: FastifyRequest, reply: FastifyRep
     if (response) {
         return reply.send({ response: response, id: req.id });
     }
-    return reply.send({ respuesta: 'No se pudo registrar el evento', id: req.id });
+    return reply.send({ response: 'No se pudo registrar el evento', id: req.id });
 };

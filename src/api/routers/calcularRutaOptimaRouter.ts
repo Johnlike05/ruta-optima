@@ -12,7 +12,7 @@ export const calcularRutaOptimaRouter = async (req: FastifyRequest, reply: Fasti
     if (response) {
         return reply.send({ ...response, id: req.id });
     }
-    return reply.send({ respuesta: 'No se pudo generar guias por que el repartidor no tiene envios asignados hoy', id: req.id });
+    return reply.send({ response: 'No se pudo generar guias por que el repartidor no tiene envios asignados hoy', id: req.id });
 };
 
 export const recalcularRutaRouter = async (req: FastifyRequest, reply: FastifyReply): Promise<FastifyReply | void> => {
@@ -20,7 +20,7 @@ export const recalcularRutaRouter = async (req: FastifyRequest, reply: FastifyRe
     const data = validateData<IEquipoIn>(IEquipoInSchema, req.params);
     const response = await entregarMasiva.recalcularRuta(data);
     if (response) {
-        return reply.send({ respuesta: response, id: req.id });
+        return reply.send({ response: response, id: req.id });
     }
-    return reply.send({ respuesta: 'No se pudo generar guias por que el repartidor no tiene envios asignados hoy', id: req.id });
+    return reply.send({ response: 'No se pudo generar guias por que el repartidor no tiene envios asignados hoy', id: req.id });
 };
