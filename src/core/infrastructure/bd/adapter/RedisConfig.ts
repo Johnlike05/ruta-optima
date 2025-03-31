@@ -1,12 +1,9 @@
 /* eslint-disable no-console */
 import Redis from "ioredis";
 
-
-const REDIS_HOST='10.2.186.83'
-const REDIS_PORT=6379
-const url = `redis://${REDIS_HOST}:${REDIS_PORT}`;
+const url = `redis://default:ispjLYdfRvdXIxbfN00IY9jhe051W4TL@redis-15763.c1.us-central1-2.gce.redns.redis-cloud.com:15763`;
 export const adapter = new Redis(url, {
-  connectTimeout: parseInt("4000"),
+  connectTimeout: parseInt(process.env.REDIS_TIMEOUT ?? "3000"),
 });
 
 adapter.on("connect", () => {
