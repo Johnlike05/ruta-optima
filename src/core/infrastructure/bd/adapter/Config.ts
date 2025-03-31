@@ -4,11 +4,11 @@ import pgPromise, { IMain, IDatabase } from 'pg-promise';
 import { IConnectionParameters } from 'pg-promise/typescript/pg-subset';
 
 const PG_CONECTION: IConnectionParameters = {
-    host: process.env.POSTGRES_HOST,
-    port: process.env.PG_PORT ? Number(process.env.PG_PORT) : 5432,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASS,
-    database: process.env.POSTGRES_DATABASE,
+    host: '104.197.87.166',
+    port: 5432,
+    user: 'jpuentes',
+    password: 'apolo123',
+    database: 'postgres',
     connectionTimeoutMillis: 15000,
     max: 15,
     idleTimeoutMillis: 15000,

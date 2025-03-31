@@ -11,10 +11,13 @@ import { middlewares } from './api/middlewares/CommonMiddleware';
 export const application = fastify({
   genReqId: (_) => randomBytes(20).toString("hex"),
 });
+application.addHook('onRoute', (routeOptions) => {
+  console.log(routeOptions.url);
+});
 
 
 application.register(fastifyJwt, {
-  secret: process.env.JWT_SECRET || "tu_secreto_super_seguro", // Usa variables de entorno para seguridad
+  secret: 'clave-prueba',
 });
 application.decorate("authenticate", async function (request:any, reply:any) {
   try {
