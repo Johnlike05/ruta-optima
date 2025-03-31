@@ -1,30 +1,27 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import 'dotenv/config';
+import "reflect-metadata";
+import dotenv from "dotenv";
+dotenv.config();
+import fastify from "fastify";
+import { randomBytes } from "crypto";
+require('module-alias/register');
+import { initRoutes } from "./api/routers";
+import fastifyJwt from "@fastify/jwt";  
+import { PREFIX } from "./util/Envs";
+import { middlewares } from './api/middlewares/CommonMiddleware';
+export const application = fastify({
+  genReqId: (_) => randomBytes(20).toString("hex"),
+});
 
-class App {
-  public express: express.Application;
-
-  constructor() {
-    this.express = express();
-    this.middlewares();
-    this.database();
-    this.routes();
+application.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET || "tu_secreto_super_seguro", // Usa variables de entorno para seguridad
+});
+application.decorate("authenticate", async function (request:any, reply:any) {
+  try {
+    await request.jwtVerify();
+  } catch (err) {
+    reply.code(401).send({ error: "Token no autorizado, hable con el administrador" });
   }
+});
+middlewares(application);
 
-  private middlewares(): void {
-    this.express.use(bodyParser.json());
-    this.express.use(cors());
-  }
-
-  private database(): void {
-    // Configuración inicial de BD (se implementará luego)
-  }
-
-  private routes(): void {
-    // Rutas principales (se implementarán luego)
-  }
-}
-
-export default new App().express;
+application.register(initRoutes, { prefix: PREFIX });
