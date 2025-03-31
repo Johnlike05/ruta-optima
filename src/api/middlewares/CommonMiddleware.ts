@@ -23,7 +23,7 @@ export const middlewares = (application: FastifyInstance): void => {
         const { id, method, url, headers, params, query, body } = req;
         console.log(
             JSON.stringify({
-                application: 'ruta-optima-service',
+                application: 'ruta-optima',
                 id,
                 method,
                 url,
