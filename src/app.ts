@@ -14,7 +14,7 @@ export const application = fastify({
 
 
 application.register(fastifyJwt, {
-  secret: process.env.JWT_SECRET || "tu_secreto_super_seguro", // Usa variables de entorno para seguridad
+  secret: "clave-prueba", // Usa variables de entorno para seguridad
 });
 application.decorate("authenticate", async function (request:any, reply:any) {
   try {

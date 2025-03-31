@@ -9,7 +9,7 @@ export async function googleMapsClient(address:string): Promise<Coordenadas | un
     const response = await client.geocode({
       params: {
         address: address + ', Colombia',
-        key: process.env.GOOGLE_MAPS_KEY,
+        key: 'AIzaSyBiBl73BPLME98ABMShRqVUNP8BYKAsnsg',
       },
       timeout: 1000
     });
