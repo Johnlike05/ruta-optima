@@ -12,6 +12,7 @@ export const application = fastify({
   genReqId: (_) => randomBytes(20).toString("hex"),
 });
 
+
 application.register(fastifyJwt, {
   secret: process.env.JWT_SECRET || "tu_secreto_super_seguro", // Usa variables de entorno para seguridad
 });
