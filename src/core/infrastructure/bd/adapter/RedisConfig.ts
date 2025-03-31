@@ -6,7 +6,7 @@ const REDIS_HOST='10.79.124.99'
 const REDIS_PORT=6379
 const url = `redis://${REDIS_HOST}:${REDIS_PORT}`;
 export const adapter = new Redis(url, {
-  connectTimeout: parseInt("4000" ?? "3000"),
+  connectTimeout: parseInt("4000"),
 });
 
 adapter.on("connect", () => {
