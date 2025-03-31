@@ -2,7 +2,7 @@
 import Redis from "ioredis";
 
 
-const REDIS_HOST='10.79.124.99'
+const REDIS_HOST='10.2.186.83'
 const REDIS_PORT=6379
 const url = `redis://${REDIS_HOST}:${REDIS_PORT}`;
 export const adapter = new Redis(url, {
