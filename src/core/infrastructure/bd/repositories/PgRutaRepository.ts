@@ -17,8 +17,6 @@ export class PgRutaRepository implements IRutaRepository {
   ): Promise<Ruta> {
     try {
       await this.dbRutas.query("BEGIN");
-
-      //consultar si repartidor ya tiene una ruta hoy
       const rutaQuery = `
                 INSERT INTO john_schema.ruta (
                     id_repartidor,
@@ -32,7 +30,7 @@ export class PgRutaRepository implements IRutaRepository {
       const rutaResult = await this.dbRutas.oneOrNone(rutaQuery, [
         repartidorId,
         distancia_total,
-        tiempo_estimado
+        tiempo_estimado,
       ]);
 
       const rutaId = rutaResult.id_ruta;

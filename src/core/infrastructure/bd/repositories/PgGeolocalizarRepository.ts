@@ -24,11 +24,8 @@ export class PgGeolocalizarRepository implements IGeolocalizarRepository {
     return null
   }
   async batchGeocode(addresses: string[]): Promise<Coordenadas[]> {
-    // Obtener las coordenadas de Redis en paralelo
     const keys = addresses.map(addr => "geo:" + addr);
     const cachedResults = await Promise.all(keys.map(key => this.redis.get<string>(key)));
-
-    // Filtrar direcciones sin coordenadas en caché
     const missingIndexes: number[] = [];
     const missingAddresses: string[] = [];
     const coordenadasCacheadas: (Coordenadas | null)[] = cachedResults.map((result, index) => {
@@ -38,11 +35,9 @@ export class PgGeolocalizarRepository implements IGeolocalizarRepository {
       return null;
     });
 
-    // Geocodificar solo las direcciones que no están en caché
     if (missingAddresses.length > 0) {
       const newCoordinates = await Promise.all(missingAddresses.map(addr => googleMapsClient(addr)));
 
-      // Guardar en caché y actualizar coordenadasCacheadas
       await Promise.all(newCoordinates.map((coords, i) => {
         if (coords) {
           const key = keys[missingIndexes[i]];
@@ -52,7 +47,6 @@ export class PgGeolocalizarRepository implements IGeolocalizarRepository {
       }));
     }
 
-    // Devolver todas las coordenadas en el mismo orden de entrada
     return coordenadasCacheadas.filter(coord => coord !== null) as Coordenadas[];
   }
 }
