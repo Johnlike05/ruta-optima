@@ -2,14 +2,13 @@ FROM node:20-alpine
 
 WORKDIR /root/
 
-COPY package.json ./
+COPY package.json yarn.lock ./
 
+ENV HUSKY=0
 RUN yarn install --production=true
 
 COPY ./dist ./dist/
 
 COPY .env ./
 
-EXPOSE 8080
-
-CMD ["yarn", "build && yarn", "start"]
+CMD [ "yarn", "start" ]
