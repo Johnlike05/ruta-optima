@@ -35,12 +35,6 @@ jobs:
       - name: Install and Build
         uses: ./.github/actions/build
 
-      - name: Create ENV File
-        run: echo ${{ secrets.ENV_PROD }} | base64 --decode > .env
-
-      - name: Log env
-        run: cat .env
-
       - name: Google Cloud authentication
         uses: google-github-actions/auth@v1
         with:
