@@ -6,9 +6,10 @@ on:
       - main
 
 env:
-  SERVICE_NAME: ruta-optima
+  SERVICE_NAME: ruta-optima-service
   REGION: us-central1
-  PROJECT_ID: pruebadesarrollosenior
+  GCP_PROJECT: ${{ secrets.PROJECT_ID_PROD }}
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -44,38 +45,25 @@ jobs:
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.CM_GCP_KEY }}
-          project_id: ${{ secrets.PROJECT_ID_PROD }}
+          project_id: ${{ env.GCP_PROJECT }}
 
       - name: Set Google SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ secrets.PROJECT_ID_PROD }}
+          project_id: ${{ env.GCP_PROJECT }}
 
       - name: Build and deploy image
-        env:
-          GCP_PROJECT: ${{ secrets.PROJECT_ID_PROD }}
-        run: |
-          PROJECT_ID=${{ secrets.PROJECT_ID_PROD }}
-          COMMIT_SHA=${{ github.sha }}
-          SERVICE_NAME=$SERVICE_NAME
-          make deploy
+        run: PROJECT_ID=${{ env.GCP_PROJECT }} COMMIT_SHA=${{ github.sha }} SERVICE_NAME=$SERVICE_NAME make deploy
 
       - name: Deploy to Cloud Run
-        env:
-          GCP_PROJECT: ${{ secrets.PROJECT_ID_PROD }}
         run: |-
           gcloud run deploy $SERVICE_NAME \
-            --image gcr.io/$GCP_PROJECT/$SERVICE_NAME:${{ github.sha }} \
+            --image gcr.io/${{ env.GCP_PROJECT }}/$SERVICE_NAME:${{ github.sha }} \
             --allow-unauthenticated \
             --region $REGION \
             --max-instances 2
 
       - name: Get URL Cloud Run
-        env:
-          GCP_PROJECT: ${{ secrets.PROJECT_ID_PROD }}
         shell: bash
         run: echo "##[set-output name=url;]$(gcloud run services describe $SERVICE_NAME --platform managed --region $REGION --format 'value(status.url)')"
         id: extract_url
-
-      - name: Verificar contenido del .env
-        run: cat .env
