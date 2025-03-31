@@ -2,11 +2,9 @@ import "reflect-metadata";
 import dotenv from "dotenv";
 dotenv.config();
 import fastify from "fastify";
-import fastifySwagger from "@fastify/swagger";
 import { randomBytes } from "crypto";
 require('module-alias/register');
 import { initRoutes } from "./api/routers";
-import { swagger_config } from "./plugin/swagger";
 import fastifyJwt from "@fastify/jwt";  
 import { PREFIX } from "./util/Envs";
 import { middlewares } from './api/middlewares/CommonMiddleware';
@@ -25,7 +23,5 @@ application.decorate("authenticate", async function (request:any, reply:any) {
   }
 });
 middlewares(application);
-
-application.register(fastifySwagger, swagger_config);
 
 application.register(initRoutes, { prefix: PREFIX });

@@ -23,20 +23,16 @@ export class PgRutaRepository implements IRutaRepository {
                     distancia_total,
                     tiempo_estimado,
                     estado
-                ) VALUES ($1, $2, $3, 'planificada')
+                ) VALUES ($/repartidorId/, $/distancia_total/, $/tiempo_estimado/, 'planificada')
                 RETURNING id_ruta
             `;
 
-      const rutaResult = await this.dbRutas.oneOrNone(rutaQuery, [
-        repartidorId,
-        distancia_total,
-        tiempo_estimado,
-      ]);
-
+      const rutaResult = await this.dbRutas.oneOrNone(rutaQuery, {
+        repartidorId: repartidorId,
+        distancia_total: distancia_total,
+        tiempo_estimado: tiempo_estimado,
+      });
       const rutaId = rutaResult.id_ruta;
-      console.log("resssss", rutaId);
-
-      // 3. Insertar puntos de ruta
       for (const [index, punto] of puntos.entries()) {
         await this.dbRutas.query(
           `
@@ -47,16 +43,16 @@ export class PgRutaRepository implements IRutaRepository {
                         longitud,
                         tiempo_estimado,
                         direccion
-                    ) VALUES ($1, $2, $3, $4, $5, $6)
+                    ) VALUES ($/rutaId/, $/index/, $/latitud/, $/longitud/, $/tiempoEstimado/, $/direccion/)
                 `,
-          [
-            rutaId,
-            index + 1,
-            punto.latitud,
-            punto.longitud,
-            punto.tiempoEstimado,
-            punto.direccion,
-          ]
+          {
+            rutaId: rutaId,
+            index: index + 1,
+            latitud: punto.latitud,
+            longitud: punto.longitud,
+            tiempoEstimado: punto.tiempoEstimado,
+            direccion: punto.direccion,
+          }
         );
       }
 
@@ -80,13 +76,13 @@ export class PgRutaRepository implements IRutaRepository {
         r.estado, 
         r.optimizada
       FROM john_schema.ruta r
-      WHERE r.id_ruta = $1;
+      WHERE r.id_ruta = $/ruta_id/;
     `;
-  
-    const ruta = await this.dbRutas.oneOrNone(queryRuta, [ruta_id]);
-  
+
+    const ruta = await this.dbRutas.oneOrNone(queryRuta, {ruta_id: ruta_id});
+
     if (!ruta) {
-      throw new Error('Ruta no encontrada');
+      throw new Error("Ruta no encontrada");
     }
     const queryPuntos = `
       SELECT 
@@ -95,31 +91,29 @@ export class PgRutaRepository implements IRutaRepository {
         pr.longitud, 
         pr.tiempo_estimado
       FROM john_schema.punto_ruta pr
-      WHERE pr.id_ruta = $1
+      WHERE pr.id_ruta = $/ruta_id/
       ORDER BY pr.orden;
     `;
-  
-    const puntos = await this.dbRutas.any(queryPuntos, [ruta_id]);
 
-    const puntosFormateados = puntos.map(punto => ({
+    const puntos = await this.dbRutas.any(queryPuntos, { ruta_id: ruta_id });
+
+    const puntosFormateados = puntos.map((punto) => ({
       orden: punto.orden,
       latitud: punto.latitud,
       longitud: punto.longitud,
       tiempoEstimado: punto.tiempo_estimado,
     }));
-  
+
     // Devolvemos la ruta junto con los puntos agrupados
     return {
       ...ruta,
       puntos: puntosFormateados,
     };
   }
-  
+
   async consultarRutaDiaria(id_repartidor: number): Promise<number | null> {
-    
     try {
-      
-        const ahora = new Date().toISOString().slice(0, 19).replace("T", " ");
+      const ahora = new Date().toISOString().slice(0, 19).replace("T", " ");
       const query = `
         SELECT id_ruta
          FROM john_schema.ruta
@@ -158,3 +152,5 @@ export class PgRutaRepository implements IRutaRepository {
     }
   }
 }
+
+
