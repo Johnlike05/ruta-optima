@@ -1,11 +1,15 @@
 # Usa una imagen oficial de Node.js con una base ligera
 FROM node:20-slim
 
-# Instala Python y pip para ejecutar OR-Tools
-RUN apt-get update && apt-get install -y python3 python3-pip
+# Instala Python y pip
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
-# Instala OR-Tools
-RUN pip3 install ortools
+# Crea y activa un entorno virtual para Python
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Instala OR-Tools dentro del entorno virtual
+RUN pip install ortools
 
 # Crea un directorio de trabajo en el contenedor
 WORKDIR /usr/src/app
