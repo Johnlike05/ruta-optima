@@ -1,5 +1,11 @@
-# Utiliza la imagen oficial de Node.js (versión de LTS compatible)
+# Usa una imagen oficial de Node.js con una base ligera
 FROM node:20-slim
+
+# Instala Python y pip para ejecutar OR-Tools
+RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Instala OR-Tools
+RUN pip3 install ortools
 
 # Crea un directorio de trabajo en el contenedor
 WORKDIR /usr/src/app
