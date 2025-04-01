@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Instala OR-Tools dentro del entorno virtual
-RUN pip install ortools
+# Instala OR-Tools y geopy dentro del entorno virtual
+RUN pip install ortools geopy
 
 # Crea un directorio de trabajo en el contenedor
 WORKDIR /usr/src/app
